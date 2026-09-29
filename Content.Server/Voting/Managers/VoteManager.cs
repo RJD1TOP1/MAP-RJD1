@@ -59,7 +59,7 @@ namespace Content.Server.Voting.Managers
         private readonly StandardVoteType[] _standardVoteTypeValues = Enum.GetValues<StandardVoteType>();
 
         private readonly SoundSpecifier _voteAudio = new SoundPathSpecifier("/Audio/_Sunrise/voting.ogg");
-        private EntityUid? _voteAudioStream;
+        // private EntityUid? _voteAudioStream; // Fire edit - отключение музыки голосования
 
         public void Initialize()
         {
@@ -167,7 +167,7 @@ namespace Content.Server.Voting.Managers
         {
             // Handle active votes.
             var remQueue = new RemQueue<int>();
-            foreach (var v in _votes.Values)
+            foreach (var v in _votes.Values.ToArray()) // Sunrise-Edit: для системы многоэтапных голосований, без этого вызывал ошибку при старте голосования в тот же момент, когда закончено старое
             {
                 // Logger.Debug($"{_timing.ServerTime}");
                 if (_timing.RealTime >= v.EndTime)
@@ -233,7 +233,8 @@ namespace Content.Server.Voting.Managers
 
             var entries = options.Options.Select(o => new VoteEntry(o.data, o.text)).ToArray();
 
-            if (_voteAudioStream != null && _entityManager.EntityExists(_voteAudioStream))
+            // Fire edit start - отключение ГРЕБАНОЙ музыки голосования
+            /*if (_voteAudioStream != null && _entityManager.EntityExists(_voteAudioStream))
             {
                 _entityManager.System<SharedAudioSystem>().Stop(_voteAudioStream);
             }
@@ -244,7 +245,8 @@ namespace Content.Server.Voting.Managers
                 audio.ResolveSound(_voteAudio),
                 Filter.Broadcast().RemovePlayers(_ignoredMusicClients),
                 true,
-                AudioParams.Default.WithLoop(true).WithVolume(-10f))!.Value.Entity;
+                AudioParams.Default.WithLoop(true).WithVolume(-10f))!.Value.Entity;*/
+            // Fire edit end
 
             // Sunrise-Start
             if (_entityManager.System<GameTicker>().RunLevel == GameRunLevel.PreRoundLobby)
@@ -411,9 +413,10 @@ namespace Content.Server.Voting.Managers
             // Still allow vote if availbable one is different from current one
             if (voteType == StandardVoteType.Preset)
             {
-                var presets = GetGamePresetsSunrise(); // Sunrise-Start
-                if (presets.Count == 1 && presets.Select(x => x.Key).Single() == _entityManager.System<GameTicker>().Preset?.ID)
+                // Sunrise edit start
+                if (!CanCallSunrisePresetVote())
                     return false;
+                // Sunrise edit end
             }
 
             return !_voteTimeout.TryGetValue(initiator.UserId, out timeSpan);
@@ -489,7 +492,7 @@ namespace Content.Server.Voting.Managers
 
             if (activeVotes < 1)
             {
-                _entityManager.System<SharedAudioSystem>().Stop(_voteAudioStream);
+                // _entityManager.System<SharedAudioSystem>().Stop(_voteAudioStream); // Fire edit - отключение музыки голосования
                 if (_entityManager.System<GameTicker>().RunLevel == GameRunLevel.PreRoundLobby)
                 {
                     if (_cfg.GetCVar(SunriseCCVars.VotePause))

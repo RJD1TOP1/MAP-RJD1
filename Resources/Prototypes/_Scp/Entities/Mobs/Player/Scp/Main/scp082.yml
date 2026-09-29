@@ -13,22 +13,51 @@
   - MobAtmosStandard
   - MobFlammable
   - InventoryBase
+  - AppearanceScpPredator
   components:
+  - type: Clumsy # слишком большой чтобы взаимодействовать с чем то
+    clumsyDefaultStunTime: 1
+    gunShootFailStunTime: 1
+    clumsyDefib: false
+    clumsyHypo: false
+    clumsySound:
+      path: /Audio/Effects/chopstickbreak.ogg
+  - type: RestrictedEquipment
+    whitelist:
+      tags:
+      - Scp082Clothing
   - type: AutoGhostRole
     disconnectDelay: 600
     pollDuration: 900
     transferDelay: 180
   - type: Scp
     class: Euclid
+  - type: Scp082
+  - type: ScpHoldable
+    minimumHolderCount: 3
+  - type: Stomach
+    specialDigestible:
+      tags:
+      - Meat
   - type: Hands
     showInHands: false
+  - type: Appearance
   - type: MobThresholds
     thresholds:
       0: Alive
-      9500: Critical
-      10000: Dead
-  - type: Body
-    prototype: Human
+      1800: Critical
+      2000: Dead
+#  - type: DamageStateVisuals временно, пока нет нужного компонента
+#    states:
+#      Alive:
+#        Base: 082_fullbody
+#        BaseUnshaded: tuxedo # временно, что бы не был голым
+#      Critical:
+#        Base: 082-dead
+#        BaseUnshaded: tuxedo-dead # временно, что бы не был голым
+#      Dead:
+#        Base: 082-dead
+#        BaseUnshaded: tuxedo-dead # временно, что бы не был голым
   - type: Inventory
     templateId: scp082
   - type: FieldOfView
@@ -42,7 +71,10 @@
     noRot: true
     drawdepth: Mobs
     sprite: _Scp/Mobs/Scp/scp-082.rsi
-    state: 082_fullbody
+    layers:
+    - map: ["base"] 
+      state: 082_fullbody
+    - map: ["jumpsuit"]
   - type: ComplexInteraction
   - type: Buckle
   - type: ZombieImmune
@@ -59,14 +91,15 @@
     baseSprintSpeed: 2.5
   - type: ScpRestriction
     canPull: true
+    canStandingState: true
   - type: Pullable
   - type: Puller
     needsHands: true
   - type: SlowOnDamage
     speedModifierThresholds:
-      3000: 0.9
-      5500: 0.8
-      7000: 0.7
+      1000: 0.9
+      1300: 0.8
+      1600: 0.7
   - type: Speech
   - type: Tag
     tags:
@@ -81,7 +114,8 @@
       collection: Punch
     damage:
       types:
-        Blunt: 40
+        Blunt: 20
+        Structural: 40
     attackRate: 1.25
     range: 2
   - type: MeleeThrowOnHit
@@ -120,3 +154,19 @@
         - MobMask
         layer:
         - MobLayer
+  - type: Vocal
+    sounds:
+      Male: SCP082
+      Female: SCP082
+      Unsexed: SCP082
+  - type: Loadout
+    prototypes: [ Scp082Gear ]
+  - type: StandingState
+  - type: RotationVisuals
+    defaultRotation: 90
+    horizontalRotation: 90
+
+- type: startingGear
+  id: Scp082Gear
+  equipment:
+    pocket2: Scp082Knife

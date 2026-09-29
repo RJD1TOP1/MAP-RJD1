@@ -71,9 +71,10 @@
   components:
   - type: Repairable # Negative values represent healing
     damage:
-      groups:
-        Brute: -60 # 20 of each Brute Type - 20% of a basic shield HP
       types:
+        Blunt: -20
+        Slash: -20
+        Piercing: -20
         Heat: -20
     fuelCost: 10 # 1/2 of a Welder for a full repair
     doAfterDelay: 5
@@ -87,6 +88,15 @@
   id: RiotShield
   description: A large tower shield. Good for controlling crowds.
   components:
+    # Fire edit start
+    - type: Sprite
+      sprite: _Scp/Objects/Weapons/Melee/shields.rsi
+      state: riot_bullet-icon
+    - type: Item
+      sprite: _Scp/Objects/Weapons/Melee/shields.rsi
+      size: Ginormous
+      heldPrefix: riot_bullet
+      # Fire edit end
     - type: MeleeThrowOnHit #Sunrise-Start
       distance: 0.7
       speed: 7
@@ -242,10 +252,12 @@
   description: A shield built for protecting against ballistics, but not much else.
   components:
     - type: Sprite
-      state: riot_bullet-icon
+      sprite: _Scp/Objects/Weapons/Melee/shields.rsi # Fire edit
+      state: riot_bul-icon # Fire edit
     - type: Item
+      sprite: _Scp/Objects/Weapons/Melee/shields.rsi # Fire edit
       size: Ginormous # Sunrise-Edit Я не ебу почему он стал маленьким
-      heldPrefix: riot_bullet
+      heldPrefix: riot_bul # Fire edit
     - type: Blocking
       passiveBlockModifier:
         coefficients:

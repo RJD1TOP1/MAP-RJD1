@@ -75,6 +75,7 @@ namespace Content.Shared.Interaction
         [Dependency] private readonly TagSystem _tagSystem = default!;
         [Dependency] private readonly UseDelaySystem _useDelay = default!;
 
+        private readonly string _cantInteractTag = "CantInteract";
         private EntityQuery<IgnoreUIRangeComponent> _ignoreUiRangeQuery;
         private EntityQuery<FixturesComponent> _fixtureQuery;
         private EntityQuery<ItemComponent> _itemQuery;
@@ -171,7 +172,7 @@ namespace Content.Shared.Interaction
                 if (ev.Message is not OpenBoundInterfaceMessage
                     || !HasComp<GhostComponent>(ev.Actor)
                     || aUiComp?.BlockSpectators == true
-                    || _tagSystem.HasTag(ev.Actor, "CantInteract")) // Starlight-Abductor edit
+                    || _tagSystem.HasTag(ev.Actor, _cantInteractTag)) // Starlight-Abductor edit
                 {
                     ev.Cancel();
                     return;
@@ -709,6 +710,11 @@ namespace Content.Shared.Interaction
 
             var ev = new InRangeOverrideEvent(origin, other);
             RaiseLocalEvent(origin, ref ev);
+
+            // Fire added start - разрешаем target-компонентам переопределять дальность взаимодействия
+            if (!ev.Handled && origin.Owner != other.Owner)
+                RaiseLocalEvent(other, ref ev);
+            // Fire added end
 
             if (ev.Handled)
             {

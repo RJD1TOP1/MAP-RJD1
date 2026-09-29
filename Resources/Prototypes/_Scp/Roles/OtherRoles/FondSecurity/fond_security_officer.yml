@@ -34,7 +34,7 @@
     outerClothing: ClothingOuterArmorBulletproof
     belt: ScpClothingBeltSecurityWebbingFilled
     id: KeyCardFondSecurityOfficer
-    ears: ClothingHeadsetAltMTF
+    ears: ClothingHeadsetAltRegionalAdministration
     pocket1: PinpointerUniversal
   storage:
     belt:
@@ -63,7 +63,7 @@
   id: FondSecurityOfficerGearAltB
   parent: FondSecurityOfficerGear
   equipment:
-    suitstorage: WeaponShotgunSPAS12
+    suitstorage: WeaponShotgunCombat
     pocket2: ScpRadioHandheldSecurity
   storage:
     back:

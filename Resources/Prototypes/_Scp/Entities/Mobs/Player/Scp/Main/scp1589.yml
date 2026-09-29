@@ -10,6 +10,13 @@
   - MobDamageable
   - MobBloodstream
   components:
+  - type: Clumsy # слишком большой чтобы взаимодействовать с чем то
+    clumsyDefaultStunTime: 1
+    gunShootFailStunTime: 1
+    clumsyDefib: false
+    clumsyHypo: false
+    clumsySound:
+      path: /Audio/Effects/chopstickbreak.ogg
   - type: AutoGhostRole
     disconnectDelay: 600
     pollDuration: 900
@@ -99,8 +106,6 @@
       reagents:
       - ReagentId: Blood
         Quantity: 5000
-  - type: Body
-    prototype: Animal
   - type: BlurryVision
     magnitude: 2
     correctionPower: 1
@@ -180,3 +185,5 @@
       collection: FootstepScp939
       params:
         volume: 3
+  - type: ScpHoldable
+    minimumHolderCount: 3

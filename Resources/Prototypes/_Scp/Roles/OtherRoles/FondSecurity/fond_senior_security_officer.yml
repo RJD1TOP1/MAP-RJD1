@@ -34,7 +34,7 @@
     neck: ClothingNeckCloakWhite
     belt: ScpClothingBeltSecurityWebbingFilled
     id: KeyCardFondSeniorSecurityOfficer
-    ears: ClothingHeadsetAltMTF
+    ears: ClothingHeadsetAltRegionalAdministration
     pocket1: PinpointerUniversal
   storage:
     belt:
@@ -64,7 +64,7 @@
   id: FondSeniorSecurityOfficerGearAltB
   parent: FondSeniorSecurityOfficerGear
   equipment:
-    suitstorage: WeaponShotgunSPAS12
+    suitstorage: WeaponShotgunCombat
     pocket2: HandheldCrewMonitor
   storage:
     back:

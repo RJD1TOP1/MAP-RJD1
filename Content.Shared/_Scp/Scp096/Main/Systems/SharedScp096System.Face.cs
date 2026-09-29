@@ -45,7 +45,7 @@ public abstract partial class SharedScp096System
         if (!_mobThreshold.TryGetThresholdForState(ent, MobState.Alive, out var aliveThreshold))
             return;
 
-        if (args.Damageable.TotalDamage == aliveThreshold)
+        if (_damageable.GetTotalDamage(ent.Owner) == aliveThreshold)
             HealFace(ent);
     }
 
@@ -81,7 +81,7 @@ public abstract partial class SharedScp096System
         if (!TryComp<DamageableComponent>(ent, out var damageable))
             return;
 
-        if (damageable.TotalDamage <= FixedPoint2.Zero)
+        if (_damageable.GetTotalDamage((ent.Owner, damageable)) <= FixedPoint2.Zero)
             return;
 
         args.Accessible = true;
@@ -97,7 +97,7 @@ public abstract partial class SharedScp096System
         if (!TryComp<DamageableComponent>(ent, out var damageable))
             return;
 
-        if (damageable.TotalDamage <= FixedPoint2.Zero)
+        if (_damageable.GetTotalDamage((ent.Owner, damageable)) <= FixedPoint2.Zero)
             return;
 
         args.InRange = true;
@@ -335,7 +335,7 @@ public abstract partial class SharedScp096System
     /// <param name="face">Лицо скромника</param>
     private void HealFace(Entity<Scp096FaceComponent> face)
     {
-        if (TryComp<DamageableComponent>(face, out var damageable) && damageable.TotalDamage != FixedPoint2.Zero)
+        if (TryComp<DamageableComponent>(face, out var damageable) && _damageable.GetTotalDamage((face.Owner, damageable)) != FixedPoint2.Zero)
             _damageable.SetAllDamage(face.Owner, FixedPoint2.Zero);
 
         // Лечим лицо и воскрешаем его.
