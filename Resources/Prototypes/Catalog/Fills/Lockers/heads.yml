@@ -14,11 +14,7 @@
     - id: ClothingHandsKnuckleDustersQM
     - id: PlushieLizardJobQuartermaster
       prob: 0.02
-    # Sunrise-start: Flippos + Cargo suit
-    - id: ClothingOuterSuitCargo
-    - id: BluespaceBox
-    - id: BluespaceBox
-      prob: 0.25
+    # Sunrise-start: Flippos
     - id: FlippoLighterSunriseQm
     # Sunrise-end
 
@@ -255,6 +251,7 @@
     - id: LeftArmCyberRipper
       prob: 0.35
     - id: FlippoLighterSunriseCmo
+    - id: MedipenCaseChiefMedicalOfficer
     #Sunrise-end
 
 # Hardsuit table, used for suit storage as well
@@ -369,7 +366,6 @@
     - id: RubberStampHos
     - id: BoxHoSCircuitboards
     - id: WeaponDisabler
-    - id: WeaponTaser
     - id: WantedListCartridge
     - id: DrinkHosFlask
     - id: PlushieLizardJobHeadofsecurity

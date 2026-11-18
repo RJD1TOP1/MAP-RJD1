@@ -32,19 +32,19 @@ using static Robust.Client.UserInterface.Controls.BaseButton;
 namespace Content.Client.UserInterface.Systems.Character;
 
 [UsedImplicitly]
-public sealed class CharacterUIController : UIController, IOnStateEntered<GameplayState>, IOnStateExited<GameplayState>, IOnSystemChanged<CharacterInfoSystem>
+public sealed partial class CharacterUIController : UIController, IOnStateEntered<GameplayState>, IOnStateExited<GameplayState>, IOnSystemChanged<CharacterInfoSystem>
 {
-    [Dependency] private readonly IEntityManager _ent = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private IEntityManager _ent = default!;
+    [Dependency] private IPlayerManager _player = default!;
+    [Dependency] private IPrototypeManager _prototypeManager = default!;
 
     [UISystemDependency] private readonly CharacterInfoSystem _characterInfo = default!;
     [UISystemDependency] private readonly SpriteSystem _sprite = default!;
     // Fire added start
-    [Dependency] private readonly ILocalizationManager _loc = default!;
-    [UISystemDependency] private readonly EmployeeClassSystem _employeeClass = default!;
-    [UISystemDependency] private readonly AccessLevelSystem _accessLevel = default!;
-    [UISystemDependency] private readonly JobSystem _job = default!;
+    [Dependency] private ILocalizationManager _loc = default!;
+    [UISystemDependency] private EmployeeClassSystem _employeeClass = default!;
+    [UISystemDependency] private AccessLevelSystem _accessLevel = default!;
+    [UISystemDependency] private JobSystem _job = default!;
     // Fire added end
 
     public override void Initialize()
@@ -143,13 +143,15 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
             return;
         }
 
-        var (entity, job, objectives, briefing, entityName) = data;
+        var (entity, objectives, briefing, jobId, entityName) = data;
 
         _window.SpriteView.SetEntity(entity);
 
         UpdateRoleType();
+        var job = _prototypeManager.Index(jobId);
+
         // Fire added start
-        UpdateJobInfo(job, ref _window);
+        UpdateJobInfo(jobId ?? string.Empty, ref _window);
         UpdateFears(entity, ref _window);
         UpdateEmployeeClass(entity, ref _window);
         UpdateAccessLevel(entity, ref _window);

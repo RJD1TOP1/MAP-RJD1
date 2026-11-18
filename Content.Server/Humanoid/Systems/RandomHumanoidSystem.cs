@@ -6,7 +6,6 @@ using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Humanoid;
 using Content.Shared.Preferences;
 using Robust.Shared.Map;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Serialization.Manager;
 
@@ -15,15 +14,14 @@ namespace Content.Server.Humanoid.Systems;
 /// <summary>
 ///     This deals with spawning and setting up random humanoids.
 /// </summary>
-public sealed class RandomHumanoidSystem : EntitySystem
+public sealed partial class RandomHumanoidSystem : EntitySystem
 {
-    [Dependency] private readonly HumanoidProfileSystem _humanoidProfile = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly ISerializationManager _serialization = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly MetaDataSystem _metaData = default!;
-    [Dependency] private readonly SharedVisualBodySystem _visualBody = default!;
-    [Dependency] private readonly SunriseHumanoidProfileSystem _sunriseProfile = default!; // Sunrise-Edit
+    [Dependency] private HumanoidProfileSystem _humanoidProfile = default!;
+    [Dependency] private ISerializationManager _serialization = default!;
+    [Dependency] private MetaDataSystem _metaData = default!;
+    [Dependency] private SharedVisualBodySystem _visualBody = default!;
+    [Dependency] private SunriseHumanoidProfileSystem _sunriseProfile = default!; // Sunrise-Edit
+    [Dependency] private IRobustRandom _random = default!; // Fire edit
 
     /// <inheritdoc/>
     public override void Initialize()
@@ -41,11 +39,11 @@ public sealed class RandomHumanoidSystem : EntitySystem
 
     public EntityUid SpawnRandomHumanoid(string prototypeId, EntityCoordinates coordinates, string name)
     {
-        if (!_prototypeManager.TryIndex<RandomHumanoidSettingsPrototype>(prototypeId, out var prototype))
+        if (!ProtoMan.TryIndex<RandomHumanoidSettingsPrototype>(prototypeId, out var prototype))
             throw new ArgumentException("Could not get random humanoid settings");
 
         var profile = HumanoidCharacterProfile.Random(prototype.SpeciesBlacklist);
-        var speciesProto = _prototypeManager.Index<SpeciesPrototype>(profile.Species);
+        var speciesProto = ProtoMan.Index<SpeciesPrototype>(profile.Species);
         var humanoid = EntityManager.CreateEntityUninitialized(speciesProto.Prototype, coordinates);
 
         _metaData.SetEntityName(humanoid, prototype.RandomizeName ? profile.Name : name);
@@ -64,7 +62,7 @@ public sealed class RandomHumanoidSystem : EntitySystem
         EntityManager.InitializeAndStartEntity(humanoid);
 
         if (prototype.VoiceWhitelist != null)
-            profile = profile.WithVoice(_random.Pick(prototype.VoiceWhitelist));
+            profile = profile.WithTtsVoice(_random.Pick(prototype.VoiceWhitelist).Id);
 
         if (prototype.GenderWhitelist != null)
             profile = profile.WithGender(_random.Pick(prototype.GenderWhitelist));

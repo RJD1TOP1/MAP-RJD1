@@ -41,15 +41,15 @@ public abstract partial class SharedScp096System : EntitySystem
      * Основная часть системы, отвечающая за самые базовые вещи.
      */
 
-    [Dependency] private readonly RandomPredictedSystem _random = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly MovementSpeedModifierSystem _speedModifier = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly ScpMaskSystem _scpMask = default!;
-    [Dependency] private readonly SharedEntityStorageSystem _entityStorage = default!;
-    [Dependency] private readonly LockSystem _lock = default!;
-    [Dependency] private readonly AlertsSystem _alerts = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private RandomPredictedSystem _random = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private MovementSpeedModifierSystem _speedModifier = default!;
+    [Dependency] private MobStateSystem _mobState = default!;
+    [Dependency] private ScpMaskSystem _scpMask = default!;
+    [Dependency] private SharedEntityStorageSystem _entityStorage = default!;
+    [Dependency] private LockSystem _lock = default!;
+    [Dependency] private AlertsSystem _alerts = default!;
+    [Dependency] private IGameTiming _timing = default!;
 
     private static readonly EntProtoId StatusEffectSleep = "StatusEffectForcedSleeping";
     private static readonly SoundSpecifier StorageOpenSound = new SoundCollectionSpecifier("MetalBreak");
@@ -210,7 +210,7 @@ public abstract partial class SharedScp096System : EntitySystem
         if (TryComp<EntityStorageComponent>(target, out var entityStorageComponent) && !entityStorageComponent.Open)
         {
             _lock.TryUnlock(target, ent);
-            _entityStorage.OpenStorage(target, entityStorageComponent);
+            _entityStorage.OpenStorage(target);
             _audio.PlayLocal(StorageOpenSound, ent, ent);
         }
     }

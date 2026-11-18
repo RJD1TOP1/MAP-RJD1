@@ -10,12 +10,12 @@ using Robust.Shared.Timing;
 
 namespace Content.Shared._Scp.Other.Deployable;
 
-public abstract class SharedDeployableSystem : EntitySystem
+public abstract partial class SharedDeployableSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -34,7 +34,7 @@ public abstract class SharedDeployableSystem : EntitySystem
             return;
 
         // Подходит ли инструмент по требованиям
-        if (!toolComponent.Qualities.All(ent.Comp.RequiredTools.Contains))
+        if (!toolComponent.Qualities.All(quality => ent.Comp.RequiredTools.Contains(quality)))
         {
             var message = Loc.GetString("deployable-tool-deny");
             _popup.PopupClient(message, args.User);

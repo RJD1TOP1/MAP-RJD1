@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using Content.Server._Sunrise.ScaleSprite;
 using Content.Server._Sunrise.VentCraw;
 using Content.Server.Stack;
 using Content.Shared._Scp.Helpers;
@@ -20,6 +19,7 @@ using Content.Shared.Item;
 using Content.Shared.Materials;
 using Content.Shared.Physics;
 using Content.Shared.Stacks;
+using Content.Shared.Sprite;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Physics.Systems;
@@ -29,17 +29,17 @@ using Robust.Shared.Timing;
 namespace Content.Server._Scp.Scp457;
 
 // TODO: Анхардкод
-public sealed class Scp457System : EntitySystem
+public sealed partial class Scp457System : EntitySystem
 {
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedSafeTimeSystem _safeTime = default!;
-    [Dependency] private readonly ScaleSpriteSystem _scaleSprite = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
-    [Dependency] private readonly StackSystem _stack = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly IPrototypeManager _proto = default!;
+    [Dependency] private DamageableSystem _damageable = default!;
+    [Dependency] private EntityLookupSystem _lookup = default!;
+    [Dependency] private SharedPhysicsSystem _physics = default!;
+    [Dependency] private SharedSafeTimeSystem _safeTime = default!;
+    [Dependency] private SharedScaleVisualsSystem _scaleVisuals = default!;
+    [Dependency] private SharedSolutionContainerSystem _solution = default!;
+    [Dependency] private StackSystem _stack = default!;
+    [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private IPrototypeManager _proto = default!;
 
     private EntityQuery<FlammableComponent> _flammableQuery;
     private EntityQuery<ReactiveComponent> _reactiveQuery;
@@ -179,17 +179,14 @@ public sealed class Scp457System : EntitySystem
             }
         }
 
-        if (!TryComp<SolutionContainerManagerComponent>(target, out var manager))
+        if (!TryComp<SolutionManagerComponent>(target, out var manager))
             return false;
 
-        foreach (var name in manager.Containers)
-        {
-            if (!_solution.TryGetSolution((target, manager), name, out _, out var solution))
-                continue;
+        if (!_solution.TryGetSolution((target, manager), manager.Container, out _, out var solution))
+            return false;
 
-            if (IsBurnableSolution(ent, solution))
-                return true;
-        }
+        if (IsBurnableSolution(ent, solution))
+            return true;
 
         return false;
     }
@@ -262,7 +259,7 @@ public sealed class Scp457System : EntitySystem
     private void UpdateAppearanceAndPhysics(Entity<Scp457Component> ent)
     {
         var component = ent.Comp;
-        _scaleSprite.Scale(ent.Owner, new Vector2(component.ObjectSize));
+        _scaleVisuals.SetSpriteScale(ent.Owner, new Vector2(component.ObjectSize));
 
         if (component.AppliedObjectSize > 0f && !MathHelper.CloseTo(component.AppliedObjectSize, component.ObjectSize))
             _physics.ScaleFixtures(ent.Owner, component.ObjectSize / component.AppliedObjectSize);

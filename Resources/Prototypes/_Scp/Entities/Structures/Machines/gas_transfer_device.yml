@@ -18,10 +18,6 @@
     inletName: inlet
     transferRate: 100
   - type: AtmosPipeLayers
-    alternativePrototypes:
-      Primary: GasTransferDevice
-      Secondary: GasTransferDevice
-      Tertiary: GasTransferDevice
   - type: NodeContainer
     nodes:
       inlet:
@@ -30,7 +26,6 @@
         pipeDirection: Longitudinal
   - type: AtmosDevice
   - type: Damageable
-    damageContainer: StructuralInorganic
     damageModifierSet: StructuralMetallicStrongScp
   - type: Destructible
     thresholds:

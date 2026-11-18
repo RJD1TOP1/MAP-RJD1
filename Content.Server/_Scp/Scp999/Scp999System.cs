@@ -3,6 +3,7 @@ using Content.Server.Actions;
 using Content.Server.Disposal.Unit;
 using Content.Server.Popups;
 using Content.Shared._Scp.Scp999;
+using Content.Shared.Disposal.Unit;
 using Content.Shared._Sunrise.VentCraw;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Damage.Systems;
@@ -23,17 +24,17 @@ namespace Content.Server._Scp.Scp999;
 
 public sealed partial class Scp999System : SharedScp999System
 {
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly PhysicsSystem _physics = default!;
-    [Dependency] private readonly FixtureSystem _fixture = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly ContainerSystem _container = default!;
-    [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly PullingSystem _pulling = default!;
-    [Dependency] private readonly ActionBlockerSystem _action = default!;
-    [Dependency] private readonly ActionsSystem _actions = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private TransformSystem _transform = default!;
+    [Dependency] private PhysicsSystem _physics = default!;
+    [Dependency] private FixtureSystem _fixture = default!;
+    [Dependency] private PopupSystem _popup = default!;
+    [Dependency] private AudioSystem _audio = default!;
+    [Dependency] private ContainerSystem _container = default!;
+    [Dependency] private TagSystem _tag = default!;
+    [Dependency] private PullingSystem _pulling = default!;
+    [Dependency] private ActionBlockerSystem _action = default!;
+    [Dependency] private ActionsSystem _actions = default!;
+    [Dependency] private IRobustRandom _random = default!;
 
     private const string WallFixtureId = "fix2";
 

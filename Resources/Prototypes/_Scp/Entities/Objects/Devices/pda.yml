@@ -1,6 +1,6 @@
 - type: entity
   abstract: true
-  parent: BasePDA
+  parent: [ BasePDA, StorePresetChaosRemoteUplink ]
   id: ScpBasePDA
   name: PDA
   description: Personal Data Assistant.
@@ -29,13 +29,6 @@
         requireAllTags: true
   - type: CartridgeLoader
     uiKey: enum.PdaUiKey.Key
-    preinstalled:
-    - CrewManifestCartridge
-    - NotekeeperCartridge
-    - NanoTaskCartridge
-    - NewsReaderCartridge
-    - NavigatorCartridge
-    - PhotoCartridge
   - type: ContainerContainer
     containers:
       PDA-pen: !type:ContainerSlot {}
@@ -46,6 +39,12 @@
     quickEquip: false
     slots:
     - Belt
+
+- type: entity
+  id: StorePresetChaosRemoteUplink
+  categories: [ HideSpawnMenu ]
+  abstract: true
+  components:
   - type: Store
     name: store-preset-name-ChaosUplink
     categories:
@@ -66,15 +65,6 @@
   components:
   - type: CartridgeLoader
     uiKey: enum.PdaUiKey.Key
-    preinstalled:
-    - CrewManifestCartridge
-    - NotekeeperCartridge
-    - NanoTaskCartridge
-    - NewsReaderCartridge
-    - PhotoCartridge
-    - WantedListCartridge
-    - LogProbeCartridge
-    - NavigatorCartridge
 
 - type: entity
   parent: ScpBasePDA
@@ -83,14 +73,6 @@
   components:
   - type: CartridgeLoader
     uiKey: enum.PdaUiKey.Key
-    preinstalled:
-    - CrewManifestCartridge
-    - NotekeeperCartridge
-    - NanoTaskCartridge
-    - NewsReaderCartridge
-    - PhotoCartridge
-    - MedTekCartridge
-    - NavigatorCartridge
 
 - type: entity
   parent: ScpBasePDA
@@ -99,15 +81,6 @@
   components:
   - type: CartridgeLoader
     uiKey: enum.PdaUiKey.Key
-    preinstalled:
-    - CrewManifestCartridge
-    - NotekeeperCartridge
-    - NanoTaskCartridge
-    - NewsReaderCartridge
-    - PhotoCartridge
-    - NetProbeCartridge
-    - AstroNavCartridge
-    - NavigatorCartridge
 
 - type: entity
   parent: ScpBasePDA
@@ -353,14 +326,6 @@
   - type: CartridgeLoader
     uiKey: enum.PdaUiKey.Key
     notificationsEnabled: false
-    preinstalled:
-    - CrewManifestCartridge
-    - NotekeeperCartridge
-    - NanoTaskCartridge
-    - NewsReaderCartridge
-    - PhotoCartridge
-    - WantedListCartridge
-    - NavigatorCartridge
 
 - type: entity
   parent: ScpBasePDA
@@ -400,14 +365,6 @@
   - type: CartridgeLoader
     uiKey: enum.PdaUiKey.Key
     notificationsEnabled: false
-    preinstalled:
-    - CrewManifestCartridge
-    - NotekeeperCartridge
-    - NanoTaskCartridge
-    - NewsReaderCartridge
-    - PhotoCartridge
-    - WantedListCartridge
-    - NavigatorCartridge
 
 - type: entity
   parent: ScpBaseEngineerPDA
@@ -618,16 +575,6 @@
       visible: false
   - type: CartridgeLoader
     uiKey: enum.PdaUiKey.Key
-    preinstalled:
-    - CrewManifestCartridge
-    - NotekeeperCartridge
-    - NanoTaskCartridge
-    - NewsReaderCartridge
-    - PhotoCartridge
-    - MedTekCartridge
-    - WantedListCartridge
-    - AstroNavCartridge
-    - NavigatorCartridge
 
 - type: entity
   parent: MobileTaskForcePDA
@@ -672,18 +619,6 @@
       visible: false
   - type: CartridgeLoader
     uiKey: enum.PdaUiKey.Key
-    preinstalled:
-    - CrewManifestCartridge
-    - NotekeeperCartridge
-    - NanoTaskCartridge
-    - NewsReaderCartridge
-    - PhotoCartridge
-    - MedTekCartridge
-    - WantedListCartridge
-    - LogProbeCartridge
-    - AstroNavCartridge
-    - NavigatorCartridge
-    - PlantAnalyzerCartridge
 
 - type: entity
   parent: ScpBasePDA
@@ -736,18 +671,6 @@
   - type: CartridgeLoader
     uiKey: enum.PdaUiKey.Key
     notificationsEnabled: false
-    preinstalled:
-    - CrewManifestCartridge
-    - NotekeeperCartridge
-    - NanoTaskCartridge
-    - NewsReaderCartridge
-    - PhotoCartridge
-    - LogProbeCartridge
-    - WantedListCartridge
-    - MedTekCartridge
-    - AstroNavCartridge
-    - NavigatorCartridge
-    - PlantAnalyzerCartridge
   - type: Clothing
     quickEquip: false
     slots:

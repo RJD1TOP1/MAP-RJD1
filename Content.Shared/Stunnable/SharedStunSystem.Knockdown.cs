@@ -30,27 +30,26 @@ namespace Content.Shared.Stunnable;
 /// </summary>
 public abstract partial class SharedStunSystem
 {
-    private EntityQuery<CrawlerComponent> _crawlerQuery;
+    [Dependency] private EntityLookupSystem _entityLookup = default!;
+    [Dependency] private SharedHandsSystem _hands = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
+    [Dependency] private SharedPhysicsSystem _physics = default!;
+    [Dependency] private StandingStateSystem _standingState = default!;
+    [Dependency] private IConfigurationManager _cfgManager = default!;
 
-    [Dependency] private readonly EntityLookupSystem _entityLookup = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly StandingStateSystem _standingState = default!;
-    [Dependency] private readonly IConfigurationManager _cfgManager = default!;
+    [Dependency] private EntityQuery<CrawlerComponent> _crawlerQuery = default!;
+    [Dependency] private EntityQuery<FixturesComponent> _fixtureQuery = default!;
 
     public static readonly ProtoId<AlertPrototype> KnockdownAlert = "Knockdown";
 
     // Fire added start
-    [Dependency] private readonly TagSystem _tag = default!; // Fire added
+    [Dependency] private TagSystem _tag = default!; // Fire added
 
     private static readonly ProtoId<TagPrototype> CanStandUpWithoutAbilityToMoveTag = "CanStandUpWithoutAbilityToMove";
     // Fire added end
 
     private void InitializeKnockdown()
     {
-        _crawlerQuery = GetEntityQuery<CrawlerComponent>();
-
         SubscribeLocalEvent<KnockedDownComponent, RejuvenateEvent>(OnRejuvenate);
 
         // Startup and Shutdown
@@ -364,7 +363,7 @@ public abstract partial class SharedStunSystem
 
         if (ev.Message != null)
         {
-            _popup.PopupClient(ev.Message.Value.Item1, entity, entity, ev.Message.Value.Item2);
+            _popup.PopupEntity(ev.Message.Value.Item1, entity, entity, ev.Message.Value.Item2);
         }
 
         return !ev.Cancelled;
@@ -394,7 +393,7 @@ public abstract partial class SharedStunSystem
         if (!IntersectingStandingColliders(entity.Owner))
             return false;
 
-        _popup.PopupClient(Loc.GetString("knockdown-component-stand-no-room"), entity, entity, PopupType.SmallCaution);
+        _popup.PopupEntity(Loc.GetString("knockdown-component-stand-no-room"), entity, entity, PopupType.SmallCaution);
         SetAutoStand(entity.Owner);
         return true;
 
@@ -456,11 +455,11 @@ public abstract partial class SharedStunSystem
 
         if (!Stamina.TryTakeStamina(entity, ev.Stamina, entity.Comp, visual: true))
         {
-            _popup.PopupClient(Loc.GetString("knockdown-component-pushup-failure"), entity, entity, PopupType.MediumCaution);
+            _popup.PopupEntity(Loc.GetString("knockdown-component-pushup-failure"), entity, entity, PopupType.MediumCaution);
             return false;
         }
 
-        _popup.PopupClient(Loc.GetString("knockdown-component-pushup-success"), entity, entity);
+        _popup.PopupEntity(Loc.GetString("knockdown-component-pushup-success"), entity, entity);
         _audio.PlayPredicted(entity.Comp.ForceStandSuccessSound, entity.Owner, entity.Owner, AudioParams.Default.WithVariation(0.025f).WithVolume(5f));
 
         return true;
@@ -480,17 +479,14 @@ public abstract partial class SharedStunSystem
         if (intersecting.Count == 0)
             return false;
 
-        var fixtureQuery = GetEntityQuery<FixturesComponent>();
-        var xformQuery = GetEntityQuery<TransformComponent>();
-
         var ourAABB = _entityLookup.GetAABBNoContainer(entity, entity.Comp.LocalPosition, entity.Comp.LocalRotation);
 
         foreach (var ent in intersecting)
         {
-            if (!fixtureQuery.TryGetComponent(ent, out var fixtures))
+            if (!_fixtureQuery.TryGetComponent(ent, out var fixtures))
                 continue;
 
-            if (!xformQuery.TryComp(ent, out var xformComp))
+            if (!TryComp(ent, out TransformComponent? xformComp))
                 continue;
 
             var xform = new Transform(xformComp.LocalPosition, xformComp.LocalRotation);
@@ -630,8 +626,8 @@ public abstract partial class SharedStunSystem
         ent.Comp.FrictionModifier = ev.FrictionModifier;
         Dirty(ent);
 
-        _movementSpeedModifier.RefreshMovementSpeedModifiers(ent);
-        _movementSpeedModifier.RefreshFrictionModifiers(ent);
+        _movementSpeedModifier.RefreshMovementSpeedModifiers(ent.Owner);
+        _movementSpeedModifier.RefreshFrictionModifiers(ent.Owner);
     }
 
     private void OnRefreshKnockedSpeed(Entity<KnockedDownComponent> entity, ref RefreshMovementSpeedModifiersEvent args)

@@ -1,5 +1,6 @@
 #pragma warning disable IDE0130
 using Content.Server.Emp;
+using Content.Shared.Radio;
 using Content.Shared.Radio.Components;
 using Robust.Server.Audio;
 
@@ -7,7 +8,7 @@ namespace Content.Server.Radio.EntitySystems;
 
 public sealed partial class HeadsetSystem
 {
-    [Dependency] private readonly AudioSystem _audio = default!;
+    [Dependency] private AudioSystem _audio = default!;
 
     private void InitializeHeadsetSounds()
     {

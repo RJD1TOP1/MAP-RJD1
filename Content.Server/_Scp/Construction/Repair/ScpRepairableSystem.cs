@@ -9,11 +9,11 @@ using Content.Shared._Scp.Damage.ExaminableDamage;
 using Content.Shared.Construction;
 using Content.Shared.Construction.Prototypes;
 using Content.Shared.Construction.Steps;
+using Content.Shared.EntityConditions;
 using Content.Shared.DoAfter;
 using Content.Shared.Examine;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Components;
-using Content.Shared.Random.Rules;
 using Content.Shared.Whitelist;
 using Robust.Server.Containers;
 using Robust.Shared.Containers;
@@ -24,18 +24,18 @@ namespace Content.Server._Scp.Construction.Repair;
 /// <summary>
 /// Система ремонта структур с использованием <see cref="ConstructionGraphPrototype"/>.
 /// </summary>
-public sealed class ScpRepairableSystem : EntitySystem
+public sealed partial class ScpRepairableSystem : EntitySystem
 {
-    [Dependency] private readonly ConstructionSystem _construction = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly RulesSystem _rules = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
-    [Dependency] private readonly DoAfterSystem _doAfter = default!;
-    [Dependency] private readonly ContainerSystem _container = default!;
-    [Dependency] private readonly StackSystem _stack = default!;
-    [Dependency] private readonly ToolSystem _tool = default!;
-    [Dependency] private readonly InteractionSystem _interaction = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private ConstructionSystem _construction = default!;
+    [Dependency] private EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private SharedEntityConditionsSystem _conditions = default!;
+    [Dependency] private PopupSystem _popup = default!;
+    [Dependency] private DoAfterSystem _doAfter = default!;
+    [Dependency] private ContainerSystem _container = default!;
+    [Dependency] private StackSystem _stack = default!;
+    [Dependency] private ToolSystem _tool = default!;
+    [Dependency] private InteractionSystem _interaction = default!;
+    [Dependency] private IPrototypeManager _prototype = default!;
 
     private const int ExaminePriority = SharedScpExaminableDamageSystem.Priority - 3;
 
@@ -99,12 +99,11 @@ public sealed class ScpRepairableSystem : EntitySystem
     #endregion
 
     /// <summary>
-    /// Проверяет все условия ремонта (RulesRule и EntityWhitelist).
+    /// Проверяет все условия ремонта (EntityCondition и EntityWhitelist).
     /// </summary>
     private bool CheckRepairConditions(EntityUid target, EntityUid user, ScpRepairableComponent repairable, bool silent = false)
     {
-        // Проверка RulesPrototype для цели
-        if (_prototype.TryIndex(repairable.TargetRules, out var targetRule) && !_rules.IsTrue(target, targetRule))
+        if (!_conditions.TryConditions(target, repairable.TargetConditions))
         {
             if (!silent)
                 _popup.PopupEntity(Loc.GetString("scp-repairable-failed-target"), target, user);
@@ -112,8 +111,7 @@ public sealed class ScpRepairableSystem : EntitySystem
             return false;
         }
 
-        // Проверка RulesPrototype для пользователя
-        if (_prototype.TryIndex(repairable.UserRules, out var userRules) && !_rules.IsTrue(user, userRules))
+        if (!_conditions.TryConditions(user, repairable.UserConditions))
         {
             if (!silent)
                 _popup.PopupEntity(Loc.GetString("scp-repairable-failed-user"), target, user);

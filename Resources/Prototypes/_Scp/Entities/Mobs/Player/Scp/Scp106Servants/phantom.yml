@@ -9,7 +9,6 @@
     - map: [ "base" ]
       state: icon
   - type: Damageable
-    damageContainer: Biological
   - type: MobState
     allowedStates:
     - Alive
@@ -28,8 +27,7 @@
     showInExamine: false
   - type: Scp106Phantom
   - type: ScpRestriction
-  - type: ToggleableNightVision
-    effect: ScpEffectNightVision
+  - type: NightVision
 
 - type: entity
   id: Scp106Phantom

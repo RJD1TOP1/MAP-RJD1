@@ -36,29 +36,32 @@ using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using Content.Shared.Whitelist;
 using Content.Shared.Chemistry.EntitySystems;
+using Robust.Server.GameObjects;
+using Content.Shared.Inventory.Events;
 
 namespace Content.Server._Scp.Scp035;
 
-public sealed class Scp035System : SharedScp035System
+public sealed partial class Scp035System : SharedScp035System
 {
-    [Dependency] private readonly HTNSystem _htn = default!;
-    [Dependency] private readonly NPCSystem _npc = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly IGameTiming _gameTiming = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly ChatSystem _chatSystem = default!;
-    [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly SharedPuddleSystem _puddle = default!;
-    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
-    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
-    [Dependency] private readonly EntityStorageSystem _entityStorage = default!;
-    [Dependency] private readonly GhostSystem _ghost = default!;
-    [Dependency] private readonly TileSystem _tile = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private HTNSystem _htn = default!;
+    [Dependency] private NPCSystem _npc = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
+    [Dependency] private IGameTiming _gameTiming = default!;
+    [Dependency] private IRobustRandom _random = default!;
+    [Dependency] private ChatSystem _chatSystem = default!;
+    [Dependency] private SharedTransformSystem _transformSystem = default!;
+    [Dependency] private EntityLookupSystem _lookup = default!;
+    [Dependency] private SharedPuddleSystem _puddle = default!;
+    [Dependency] private SharedSolutionContainerSystem _solutionContainer = default!;
+    [Dependency] private IPrototypeManager _prototypeManager = default!;
+    [Dependency] private ThrowingSystem _throwing = default!;
+    [Dependency] private EntityStorageSystem _entityStorage = default!;
+    [Dependency] private GhostSystem _ghost = default!;
+    [Dependency] private TileSystem _tile = default!;
+    [Dependency] private DamageableSystem _damageable = default!;
+    [Dependency] private MindSystem _mind = default!;
+    [Dependency] private EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private MapSystem _map = default!;
 
     public override void Initialize()
     {
@@ -75,18 +78,18 @@ public sealed class Scp035System : SharedScp035System
         RaiseLocalEvent(ent, ref toggleUsed);
     }
 
-    protected override void OnMaskEquipped(Entity<Scp035MaskComponent> ent, ref ClothingGotEquippedEvent args)
+    protected override void OnMaskEquipped(Entity<Scp035MaskComponent> ent, ref GotEquippedEvent args)
     {
         base.OnMaskEquipped(ent, ref args);
 
-        if (!_mind.TryGetMind(args.Wearer, out var mindId, out var mind))
+        if (!_mind.TryGetMind(args.EquipTarget, out var mindId, out var mind))
             return;
 
         if (!_ghost.OnGhostAttempt(mindId, false, false, false, mind))
             return;
 
-        EnsureComp<GhostTakeoverAvailableComponent>(args.Wearer);
-        var ghostRoleComp = EnsureComp<GhostRoleComponent>(args.Wearer);
+        EnsureComp<GhostTakeoverAvailableComponent>(args.EquipTarget);
+        var ghostRoleComp = EnsureComp<GhostRoleComponent>(args.EquipTarget);
         ghostRoleComp.RoleName = Loc.GetString("scp-035-ghost-role-name");
         ghostRoleComp.RoleDescription = Loc.GetString("scp-035-ghost-role-desc");
         ghostRoleComp.RaffleConfig = new GhostRoleRaffleConfig(ent.Comp.GhostSettings);
@@ -197,9 +200,9 @@ public sealed class Scp035System : SharedScp035System
             var xform = Transform(entity);
             if (!TryComp<MapGridComponent>(xform.GridUid, out var map))
                 return;
-            var tiles = map.GetTilesIntersecting(Box2.CenteredAround(_transformSystem.GetWorldPosition(xform),
-                entity.Comp.CorrosionBox))
-                .ToArray();
+
+            var tiles = _map.GetTilesIntersecting(xform.GridUid.Value, map, Box2.CenteredAround(_transformSystem.GetWorldPosition(xform),
+                entity.Comp.CorrosionBox)).ToArray();
 
             _random.Shuffle(tiles);
 
@@ -226,7 +229,7 @@ public sealed class Scp035System : SharedScp035System
 
                 // randomly opens some lockers and such.
                 if (entityStorage.TryGetComponent(ent, out var entstorecomp))
-                    _entityStorage.OpenStorage(ent, entstorecomp);
+                    _entityStorage.OpenStorage((ent, entstorecomp));
 
                 // chucks items
                 if (items.HasComponent(ent) &&

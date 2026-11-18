@@ -21,7 +21,7 @@
   - type: MultiHandedItem
   - type: Scp
     class: Safe
-  - type: Muted
+  - type: MutedStatusEffect
   - type: NpcFactionMember
     factions:
     - SimpleNeutral # нужно что бы турели не били их т.к. они мирные
@@ -29,7 +29,6 @@
     baseWalkSpeed: 7
     baseSprintSpeed: 4
   - type: Damageable
-    damageContainer: Biological
     damageModifierSet: Scale
   - type: GhostPanelAntagonistMarker
     name: ghost-panel-antagonist-scp-minor-name

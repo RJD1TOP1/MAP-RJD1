@@ -4,7 +4,7 @@ using Content.Server.Storage.EntitySystems;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Humanoid;
 using Content.Shared.Inventory;
-using Content.Shared.Random.Rules;
+using Content.Shared.EntityConditions;
 using Content.Shared.Storage;
 using Robust.Server.Audio;
 using Robust.Server.Containers;
@@ -12,14 +12,14 @@ using Robust.Shared.Random;
 
 namespace Content.Server._Scp.GameTicking.Rules.SpawnInPlayerInventory;
 
-public sealed class SpawnInPlayerInventoryRule : StationEventSystem<SpawnInPlayerInventoryRuleComponent>
+public sealed partial class SpawnInPlayerInventoryRule : StationEventSystem<SpawnInPlayerInventoryRuleComponent>
 {
-    [Dependency] private readonly InventorySystem _inventory = default!;
-    [Dependency] private readonly ContainerSystem _container = default!;
-    [Dependency] private readonly StorageSystem _storage = default!;
-    [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly RulesSystem _rules = default!;
+    [Dependency] private InventorySystem _inventory = default!;
+    [Dependency] private ContainerSystem _container = default!;
+    [Dependency] private StorageSystem _storage = default!;
+    [Dependency] private StationSystem _station = default!;
+    [Dependency] private AudioSystem _audio = default!;
+    [Dependency] private SharedEntityConditionsSystem _conditions = default!;
 
     private const string Pocket1Slot = "pocket1";
     private const string Pocket2Slot = "pocket2";
@@ -36,10 +36,9 @@ public sealed class SpawnInPlayerInventoryRule : StationEventSystem<SpawnInPlaye
         if (!TryGetRandomStation(out var station))
             return;
 
-        if (_prototype.TryIndex(component.StationRules, out var stationRule) &&
-            !_rules.IsTrue(station.Value, stationRule))
+        if (!_conditions.TryConditions(station.Value, component.StationConditions))
         {
-            Log.Info($"Skipped {Prototype(uid)} due to {component.StationRules} fails! Event aborted");
+            Log.Info($"Skipped {Prototype(uid)} because station conditions failed. Event aborted");
             return;
         }
 

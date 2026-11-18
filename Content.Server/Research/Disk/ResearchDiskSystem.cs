@@ -10,11 +10,10 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Server.Research.Disk
 {
-    public sealed class ResearchDiskSystem : EntitySystem
+    public sealed partial class ResearchDiskSystem : EntitySystem
     {
-        [Dependency] private readonly IPrototypeManager _prototype = default!;
-        [Dependency] private readonly PopupSystem _popupSystem = default!;
-        [Dependency] private readonly ResearchSystem _research = default!;
+        [Dependency] private PopupSystem _popupSystem = default!;
+        [Dependency] private ResearchSystem _research = default!;
         public override void Initialize()
         {
             base.Initialize();
@@ -49,7 +48,7 @@ namespace Content.Server.Research.Disk
 
             var allTechValue = new Dictionary<ProtoId<ResearchPointPrototype>, int>();
 
-            foreach (var prototype in _prototype.EnumeratePrototypes<TechnologyPrototype>())
+            foreach (var prototype in ProtoMan.EnumeratePrototypes<TechnologyPrototype>())
             {
                 // Fire edit - поддержка несколько видов очков исследований
                 foreach (var (pointType, value) in ResearchPointsHelper.GetPoints(prototype))

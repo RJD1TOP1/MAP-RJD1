@@ -5,17 +5,20 @@ using Content.Shared.Mech.Components;
 using Content.Shared.Popups;
 using Content.Shared.Storage.Components;
 using Content.Shared.Storage.EntitySystems;
+using Content.Shared.Vehicle.Components;
+using Content.Shared.Vehicle.Systems;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.Whitelist;
 
 namespace Content.Shared._Scp.Mobs.Systems;
 
-public sealed class ScpPossibilitiesSystem : EntitySystem
+public sealed partial class ScpPossibilitiesSystem : EntitySystem
 {
-    [Dependency] private readonly RandomPredictedSystem _random = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedEntityStorageSystem _entityStorage = default!;
+    [Dependency] private RandomPredictedSystem _random = default!;
+    [Dependency] private EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
+    [Dependency] private SharedEntityStorageSystem _entityStorage = default!;
+    [Dependency] private VehicleSystem _vehicle = default!;
     public override void Initialize()
     {
         base.Initialize();
@@ -28,7 +31,7 @@ public sealed class ScpPossibilitiesSystem : EntitySystem
         if (args.HitEntities.Count == 0 || !args.IsHit)
             return;
 
-        if (ent.Comp.CanEjectPilotFromMech)
+        if (ent.Comp.CanEjectPilotFromVehicle)
             TryEjectFromMech(ref args);
 
         if (ent.Comp.OpenContainer)
@@ -39,14 +42,13 @@ public sealed class ScpPossibilitiesSystem : EntitySystem
     {
         foreach (var target in args.HitEntities)
         {
-            if (!TryComp<MechComponent>(target, out var mechComp))
+            if (!HasComp<VehicleComponent>(target))
                 continue;
 
-            if (mechComp.PilotSlot.ContainedEntity == null)
+            if (!_vehicle.HasOperator(target))
                 continue;
 
-            var ev = new MechEjectPilotEvent();
-            RaiseLocalEvent(target, ev);
+            _vehicle.TryExit(target);
         }
     }
 

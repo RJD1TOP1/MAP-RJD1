@@ -62,7 +62,7 @@
     - WhitelistChameleon
 
 - type: entity
-  parent: [ClothingEyesHudBase, ShowSecurityIcons, BaseSecurityContraband]
+  parent: [ClothingEyesHudBase, BaseSecurityContraband] # Fire edit блять зачем они этот неудобный квадрат юзают
   id: ClothingEyesHudSecurity
   name: security hud
   description: A heads-up display that scans the humanoids in view and provides accurate data about their ID status and security records.
@@ -88,7 +88,7 @@
     sprite: Clothing/Eyes/Hud/command.rsi
   - type: Clothing
     sprite: Clothing/Eyes/Hud/command.rsi
-  - type: ShowJobIcons
+#  - type: ShowJobIcons Fire edit
   - type: Tag
     tags:
     - PetWearable
@@ -104,7 +104,9 @@
     sprite: Clothing/Eyes/Hud/beergoggles.rsi
   - type: Clothing
     sprite: Clothing/Eyes/Hud/beergoggles.rsi
-  - type: ShowThirstIcons
+  - type: ShowSatiationIcons
+    shownTypes:
+    - Thirst
   - type: SolutionScanner
   - type: Tag
     tags:
@@ -112,8 +114,8 @@
     - WhitelistChameleon
 
 - type: entity
-  parent: ClothingEyesHudBase
-  id: ClothingEyesHudFriedOnion
+  parent: [SolutionFood, SolutionSmall, ClothingEyesHudBase]
+  id: ClothingEyesHudFriedOnion # It's been too long since I've had good onion rings...
   name: fried onion goggles
   description: Filler
   components:
@@ -121,19 +123,19 @@
     sprite: Clothing/Eyes/Hud/friedonion.rsi
   - type: Clothing
     sprite: Clothing/Eyes/Hud/friedonion.rsi
-  - type: ShowHungerIcons
+  - type: ShowSatiationIcons
+    shownTypes:
+    - Hunger
   - type: Edible
-  - type: SolutionContainerManager
-    solutions:
-      food:
-        maxVol: 3
-        reagents:
-        - ReagentId: Nutriment
-          Quantity: 3
+  - type: Solution
+    solution:
+      reagents:
+      - ReagentId: Nutriment
+        Quantity: 30
   - type: FlavorProfile
     flavors:
       - onion
-      - greasey
+      - oily
 
 - type: entity
   parent: ClothingEyesHudBase
@@ -145,8 +147,10 @@
     sprite: Clothing/Eyes/Hud/onionbeer.rsi
   - type: Clothing
     sprite: Clothing/Eyes/Hud/onionbeer.rsi
-  - type: ShowHungerIcons
-  - type: ShowThirstIcons
+  - type: ShowSatiationIcons
+    shownTypes:
+    - Hunger
+    - Thirst
 
 - type: entity
   parent: [ClothingEyesHudBase, ShowMedicalIcons]
@@ -158,7 +162,9 @@
     sprite: Clothing/Eyes/Hud/medonion.rsi
   - type: Clothing
     sprite: Clothing/Eyes/Hud/medonion.rsi
-  - type: ShowHungerIcons
+  - type: ShowSatiationIcons
+    shownTypes:
+    - Hunger
 
 - type: entity
   parent: [ClothingEyesHudBase, ShowMedicalIcons]
@@ -170,11 +176,13 @@
     sprite: Clothing/Eyes/Hud/medonionbeer.rsi
   - type: Clothing
     sprite: Clothing/Eyes/Hud/medonionbeer.rsi
-  - type: ShowHungerIcons
-  - type: ShowThirstIcons
+  - type: ShowSatiationIcons
+    shownTypes:
+    - Hunger
+    - Thirst
 
 - type: entity
-  parent: [ClothingEyesHudBase, ShowSecurityIcons, ShowMedicalIcons, BaseSecurityCommandContraband]
+  parent: [ClothingEyesHudBase, ShowMedicalIcons, BaseSecurityCommandContraband] # Fire edit
   id: ClothingEyesHudMedSec
   name: medsec hud
   description: An eye display that looks like a mixture of medical and security huds.
@@ -189,7 +197,7 @@
   - type: AddWantedStatus # Sunrise-edit
 
 - type: entity
-  parent: [ClothingEyesHudBase, ShowSecurityIcons, ShowMedicalIcons]
+  parent: [ClothingEyesHudBase, ShowMedicalIcons] # Fire edit
   id: ClothingEyesHudMultiversal
   name: multiversal hud
   description: Filler
@@ -218,8 +226,10 @@
     damageContainers:
     - Biological
     - Inorganic
-  - type: ShowHungerIcons
-  - type: ShowThirstIcons
+  - type: ShowSatiationIcons
+    shownTypes:
+    - Hunger
+    - Thirst
   - type: ShowSyndicateIcons
 
 - type: entity

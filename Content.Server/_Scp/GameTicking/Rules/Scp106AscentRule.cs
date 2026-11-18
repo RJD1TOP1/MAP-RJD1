@@ -11,16 +11,17 @@ using Content.Server.Ghost;
 using Content.Server.Jittering;
 using Content.Server.Nuke;
 using Content.Server.RoundEnd;
-using Content.Server.Speech.EntitySystems;
 using Content.Server.Stunnable;
 using Content.Shared._Scp.Audio;
 using Content.Shared._Scp.Scp106;
 using Content.Shared._Scp.Scp106.Components;
+using Content.Shared.AlertLevel;
 using Content.Shared.Audio;
 using Content.Shared.GameTicking;
 using Content.Shared.GameTicking.Components;
 using Content.Shared.Humanoid;
 using Content.Shared.Light.Components;
+using Content.Shared.Speech.EntitySystems;
 using Content.Shared.StatusEffect;
 using Robust.Server.Audio;
 using Robust.Shared.Audio;
@@ -32,22 +33,22 @@ using Timer = Robust.Shared.Timing.Timer;
 namespace Content.Server._Scp.GameTicking.Rules;
 
 // TODO: Разбить этот гигакод на партиалы
-public sealed class Scp106AscentRule : GameRuleSystem<Scp106AscentRuleComponent>
+public sealed partial class Scp106AscentRule : GameRuleSystem<Scp106AscentRuleComponent>
 {
-    [Dependency] private readonly JitteringSystem _jittering = default!;
-    [Dependency] private readonly StutteringSystem _stuttering = default!;
-    [Dependency] private readonly StunSystem _stun = default!;
-    [Dependency] private readonly ChatSystem _chat = default!;
-    [Dependency] private readonly AlertLevelSystem _alertLevel = default!;
-    [Dependency] private readonly GhostSystem _ghost = default!;
-    [Dependency] private readonly NukeSystem _nuke = default!;
-    [Dependency] private readonly Scp106System _scp106 = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
-    [Dependency] private readonly AudioEffectsManagerSystem _effectsManager = default!;
-    [Dependency] private readonly RoundEndSystem _roundEnd = default!;
-    [Dependency] private readonly GameTicker _gameTicker = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private JitteringSystem _jittering = default!;
+    [Dependency] private StutteringSystem _stuttering = default!;
+    [Dependency] private StunSystem _stun = default!;
+    [Dependency] private ChatSystem _chat = default!;
+    [Dependency] private AlertLevelSystem _alertLevel = default!;
+    [Dependency] private GhostSystem _ghost = default!;
+    [Dependency] private NukeSystem _nuke = default!;
+    [Dependency] private Scp106System _scp106 = default!;
+    [Dependency] private EntityLookupSystem _lookup = default!;
+    [Dependency] private AudioSystem _audio = default!;
+    [Dependency] private AudioEffectsManagerSystem _effectsManager = default!;
+    [Dependency] private RoundEndSystem _roundEnd = default!;
+    [Dependency] private GameTicker _gameTicker = default!;
+    [Dependency] private IGameTiming _timing = default!;
 
     private static readonly TimeSpan AscentStunTime = TimeSpan.FromSeconds(10f);
     private static readonly TimeSpan AscentJitterTime = TimeSpan.FromSeconds(15f);
@@ -78,7 +79,7 @@ public sealed class Scp106AscentRule : GameRuleSystem<Scp106AscentRuleComponent>
     private static readonly ProtoId<AudioPresetPrototype> FancyEffect = "Dizzy";
 
     private const string RuleAddedCode = "scpPurple";
-    private const string RuleStartedCode = "scpGamma";
+    private const string RuleStartedCode = "scpBlack";
 
     private static readonly TimeSpan ReturnCachedAlertLevelAfter = TimeSpan.FromSeconds(5f);
 
@@ -154,7 +155,8 @@ public sealed class Scp106AscentRule : GameRuleSystem<Scp106AscentRuleComponent>
         Timer.Spawn(AscentAnnounceAfter,
             () =>
             {
-                component.CachedAlertLevel = _alertLevel.GetLevel(station.Value);
+                if (_alertLevel.TryGetLevel(station.Value, out var alertLevelProto) && alertLevelProto is { } level)
+                    component.CachedAlertLevel = level;
                 _alertLevel.SetLevel(station.Value, RuleAddedCode, true, true, true);
             },
             _timerDespawnToken.Token);

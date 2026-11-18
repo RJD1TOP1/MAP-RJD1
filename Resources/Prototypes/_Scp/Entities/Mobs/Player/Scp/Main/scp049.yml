@@ -39,7 +39,7 @@
     canMobCollide: true
   - type: ScpShow049Hud
   - type: ScpPossibilities
-    canEjectPilotFromMech: false
+    canEjectPilotFromVehicle: false
     openContainer: false
   - type: FearSource
     uponSeenState: Anxiety
@@ -106,3 +106,6 @@
   - type: Appearance
   - type: Perishable
   - type: HoldToFace
+  - type: RotationVisuals
+    defaultRotation: 0
+    horizontalRotation: 90

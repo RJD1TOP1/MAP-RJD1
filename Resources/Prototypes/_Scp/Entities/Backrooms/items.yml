@@ -64,8 +64,9 @@
   name: strange cowboy hat
   suffix: SCP Item
   components:
-  - type: AddAccentClothing
-    accent: DogAccent
+  - type: ClothingAddComponents
+    components:
+    - type: DogAccent
   - type: AddDrunkClothing
 
 - type: entity
@@ -231,10 +232,7 @@
         acts: [ "Destruction" ]
   - type: Speech
   - type: Vocal # ╰(▔∀▔)╯
-    sounds:
-      Male: MaleVulpkanin
-      Female: FemaleVulpkanin
-      Unsexed: MaleVulpkanin
+    emoteSounds: MaleVulpkanin
   - type: Emoting
   - type: EmitEmotesPeriodically
     emotes:
@@ -257,7 +255,6 @@
   suffix: SCP Item
   components:
   - type: SolutionRegeneration
-    solution: drink
     generated:
       reagents:
       - ReagentId: Coffee
@@ -393,17 +390,17 @@
     slots:
     - neck
 
-- type: entity
-  parent: BaseItem
-  id: ScpBackroomsScull
-  name: strange scull
-  suffix: SCP Item
-  components:
-  - type: Sprite
-    sprite: Mobs/Species/Terminator/parts.rsi
-    state: skull_icon
-  - type: Item
-    size: Normal
+#- type: entity
+#  parent: BaseItem
+#  id: ScpBackroomsScull
+#  name: strange scull
+#  suffix: SCP Item
+#  components:
+#  - type: Sprite
+#    sprite: Mobs/Species/Terminator/parts.rsi
+#    state: skull_icon
+#  - type: Item
+#    size: Normal
 
 - type: entity
   parent: ClothingHeadHatFancyCrown

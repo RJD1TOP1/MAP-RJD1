@@ -3,7 +3,7 @@ using Content.Server.StationEvents.Events;
 using Content.Server.Storage.EntitySystems;
 using Content.Shared.GameTicking;
 using Content.Shared.GameTicking.Components;
-using Content.Shared.Random.Rules;
+using Content.Shared.EntityConditions;
 using Content.Shared.Storage;
 using Content.Shared.Storage.Components;
 using Robust.Shared.Random;
@@ -11,12 +11,12 @@ using Robust.Shared.Timing;
 
 namespace Content.Server._Scp.GameTicking.Rules.SpawnInEntityStorage;
 
-public sealed class SpawnInEntityStorageRule : StationEventSystem<SpawnInEntityStorageRuleComponent>
+public sealed partial class SpawnInEntityStorageRule : StationEventSystem<SpawnInEntityStorageRuleComponent>
 {
-    [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly EntityStorageSystem _storage = default!;
-    [Dependency] private readonly RulesSystem _rules = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private StationSystem _station = default!;
+    [Dependency] private EntityStorageSystem _storage = default!;
+    [Dependency] private SharedEntityConditionsSystem _conditions = default!;
+    [Dependency] private IGameTiming _timing = default!;
 
     private readonly List<PendingClose> _pendingStorageClosing = [];
 
@@ -39,7 +39,7 @@ public sealed class SpawnInEntityStorageRule : StationEventSystem<SpawnInEntityS
 
             var ent = _pendingStorageClosing[i].Entity;
             if (Exists(ent))
-                _storage.CloseStorage(ent, ent.Comp);
+                _storage.CloseStorage(ent.AsNullable());
 
             _pendingStorageClosing.RemoveAt(i);
         }
@@ -62,10 +62,9 @@ public sealed class SpawnInEntityStorageRule : StationEventSystem<SpawnInEntityS
         if (!TryGetRandomStation(out var station))
             return;
 
-        if (_prototype.TryIndex(component.StationRules, out var stationRule) &&
-            !_rules.IsTrue(station.Value, stationRule))
+        if (!_conditions.TryConditions(station.Value, component.StationConditions))
         {
-            Log.Info($"Skipped {Prototype(uid)} due to {component.StationRules} fails! Event aborted");
+            Log.Info($"Skipped {Prototype(uid)} because station conditions failed. Event aborted");
             return;
         }
 
@@ -95,7 +94,7 @@ public sealed class SpawnInEntityStorageRule : StationEventSystem<SpawnInEntityS
 
     private void OpenStorage(EntityUid storage, EntityStorageComponent component, SpawnInEntityStorageRuleComponent rule)
     {
-        _storage.OpenStorage(storage, component);
+        _storage.OpenStorage((storage, component));
         if (!_storage.IsOpen(storage, component))
             return;
 

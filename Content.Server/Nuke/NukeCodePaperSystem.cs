@@ -10,13 +10,13 @@ using Robust.Shared.Utility;
 
 namespace Content.Server.Nuke
 {
-    public sealed class NukeCodePaperSystem : EntitySystem
+    public sealed partial class NukeCodePaperSystem : EntitySystem
     {
-        [Dependency] private readonly IRobustRandom _random = default!;
-        [Dependency] private readonly ChatSystem _chatSystem = default!;
-        [Dependency] private readonly StationSystem _station = default!;
-        [Dependency] private readonly PaperSystem _paper = default!;
-        [Dependency] private readonly FaxSystem _faxSystem = default!;
+        [Dependency] private IRobustRandom _random = default!;
+        [Dependency] private ChatSystem _chatSystem = default!;
+        [Dependency] private StationSystem _station = default!;
+        [Dependency] private PaperSystem _paper = default!;
+        [Dependency] private FaxSystem _faxSystem = default!;
 
         public override void Initialize()
         {
@@ -46,7 +46,8 @@ namespace Content.Server.Nuke
         ///     Send a nuclear code to all faxes on that station which are authorized to receive nuke codes.
         /// </summary>
         /// <returns>True if at least one fax received codes</returns>
-        public bool SendNukeCodes(EntityUid station)
+        // Fire edit start
+        public bool SendNukeCodes(EntityUid station, bool sendAnnounce = true, string stamp = "paper_stamp-centcom", string stampName = "stamp-component-stamped-name-centcom")
         {
             if (!HasComp<StationDataComponent>(station))
             {
@@ -67,10 +68,10 @@ namespace Content.Server.Nuke
                     Loc.GetString("nuke-codes-fax-paper-name"),
                     null,
                     null,
-                    "paper_stamp-centcom",
+                    stamp,
                     new List<StampDisplayInfo>
                     {
-                        new StampDisplayInfo { StampedName = Loc.GetString("stamp-component-stamped-name-centcom"), StampedColor = Color.FromHex("#BB3232") },
+                        new StampDisplayInfo { StampedName = stampName, StampedColor = Color.FromHex("#BB3232") },
                     }
                 );
                 _faxSystem.Receive(faxEnt, printout, null, fax);
@@ -78,7 +79,7 @@ namespace Content.Server.Nuke
                 wasSent = true;
             }
 
-            if (wasSent)
+            if (wasSent && sendAnnounce)
             {
                 var msg = Loc.GetString("nuke-component-announcement-send-codes");
                 _chatSystem.DispatchStationAnnouncement(station, msg, colorOverride: Color.Red);
@@ -86,6 +87,7 @@ namespace Content.Server.Nuke
 
             return wasSent;
         }
+        // Fire edit end
 
         private bool TryGetRelativeNukeCode(
             EntityUid uid,

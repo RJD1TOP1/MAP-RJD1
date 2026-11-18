@@ -24,29 +24,28 @@ using Robust.Shared.Random;
 
 namespace Content.Shared._Scp.Scp035;
 
-// TODO: Придумать что-то с акшенами, не очень смотрятся эти AddAction x6
-public abstract class SharedScp035System : EntitySystem
+public abstract partial class SharedScp035System : EntitySystem
 {
-    [Dependency] private readonly SharedStunSystem _stun = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
-    [Dependency] private readonly SharedActionsSystem _action = default!;
-    [Dependency] private readonly MobStateSystem _mobState = default!;
-    [Dependency] private readonly NpcFactionSystem _faction = default!;
-    [Dependency] private readonly MobThresholdSystem _mobThreshold = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly INetManager _net = default!;
-    [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private SharedStunSystem _stun = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
+    [Dependency] private SharedContainerSystem _container = default!;
+    [Dependency] private SharedTransformSystem _transform = default!;
+    [Dependency] private SharedPhysicsSystem _physics = default!;
+    [Dependency] private SharedActionsSystem _action = default!;
+    [Dependency] private MobStateSystem _mobState = default!;
+    [Dependency] private NpcFactionSystem _faction = default!;
+    [Dependency] private MobThresholdSystem _mobThreshold = default!;
+    [Dependency] private SharedHandsSystem _hands = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private INetManager _net = default!;
+    [Dependency] private IRobustRandom _random = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<Scp035MaskComponent, ClothingGotEquippedEvent>(OnMaskEquipped);
-        SubscribeLocalEvent<Scp035MaskComponent, ClothingGotUnequippedEvent>(OnMaskUnequipped);
+        SubscribeLocalEvent<Scp035MaskComponent, GotEquippedEvent>(OnMaskEquipped);
+        SubscribeLocalEvent<Scp035MaskComponent, GotUnequippedEvent>(OnMaskUnequipped);
         SubscribeLocalEvent<Scp035MaskComponent, BeingEquippedAttemptEvent>(OnEquippeAttempt);
 
         SubscribeLocalEvent<Scp035MaskUserComponent, MeleeHitEvent>(OnMeleeHit);
@@ -59,39 +58,39 @@ public abstract class SharedScp035System : EntitySystem
         SubscribeLocalEvent<Scp035ServantComponent, ComponentShutdown>(OnServantShutdown);
     }
 
-    protected virtual void OnMaskEquipped(Entity<Scp035MaskComponent> ent, ref ClothingGotEquippedEvent args)
+    protected virtual void OnMaskEquipped(Entity<Scp035MaskComponent> ent, ref GotEquippedEvent args)
     {
         EnsureComp<UnremoveableComponent>(ent);
 
-        ent.Comp.User = args.Wearer;
+        ent.Comp.User = args.EquipTarget;
         Dirty(ent);
 
-        var maskUserComponent = EnsureComp<Scp035MaskUserComponent>(args.Wearer);
+        var maskUserComponent = EnsureComp<Scp035MaskUserComponent>(args.EquipTarget);
         maskUserComponent.Mask = ent;
 
-        ToggleActions(maskUserComponent, ent.Comp, args.Wearer, true);
-        Dirty(args.Wearer, maskUserComponent);
+        ToggleActions(maskUserComponent, ent.Comp, args.EquipTarget, true);
+        Dirty(args.EquipTarget, maskUserComponent);
 
-        _faction.ClearFactions(args.Wearer);
-        _faction.AddFaction(args.Wearer, ent.Comp.NewUserFaction);
+        _faction.ClearFactions(args.EquipTarget);
+        _faction.AddFaction(args.EquipTarget, ent.Comp.NewUserFaction);
 
-        _mobThreshold.SetMobStateThreshold(args.Wearer, ent.Comp.NewCriticalThreshold, MobState.Critical);
-        _mobThreshold.SetMobStateThreshold(args.Wearer, ent.Comp.NewDeadThreshold, MobState.Dead);
-        RemComp<SlowOnDamageComponent>(args.Wearer);
+        _mobThreshold.SetMobStateThreshold(args.EquipTarget, ent.Comp.NewCriticalThreshold, MobState.Critical);
+        _mobThreshold.SetMobStateThreshold(args.EquipTarget, ent.Comp.NewDeadThreshold, MobState.Dead);
+        RemComp<SlowOnDamageComponent>(args.EquipTarget);
 
-        _stun.TryAddParalyzeDuration(args.Wearer, ent.Comp.EquippedParalyzeDuration);
+        _stun.TryAddParalyzeDuration(args.EquipTarget, ent.Comp.EquippedParalyzeDuration);
 
-        _popup.PopupClient(Loc.GetString("scp-035-paralyze-effect"), args.Wearer, args.Wearer, PopupType.LargeCaution);
-        _audio.PlayEntity(ent.Comp.EquipSound, args.Wearer, args.Wearer);
+        _popup.PopupClient(Loc.GetString("scp-035-paralyze-effect"), args.EquipTarget, args.EquipTarget, PopupType.LargeCaution);
+        _audio.PlayEntity(ent.Comp.EquipSound, args.EquipTarget, args.EquipTarget);
 
-        var weapon = Spawn(ent.Comp.SpawnWeaponProto, Transform(args.Wearer).Coordinates);
-        _hands.TryForcePickupAnyHand(args.Wearer, weapon, false);
+        var weapon = Spawn(ent.Comp.SpawnWeaponProto, Transform(args.EquipTarget).Coordinates);
+        _hands.TryForcePickupAnyHand(args.EquipTarget, weapon, false);
 
         var toggleUsed = new ItemToggledEvent(true, false, null);
         RaiseLocalEvent(ent, ref toggleUsed);
     }
 
-    private void OnMaskUnequipped(Entity<Scp035MaskComponent> ent, ref ClothingGotUnequippedEvent args)
+    private void OnMaskUnequipped(Entity<Scp035MaskComponent> ent, ref GotUnequippedEvent args)
     {
         ent.Comp.User = null;
         Dirty(ent);
@@ -99,7 +98,7 @@ public abstract class SharedScp035System : EntitySystem
         var toggleUsed = new ItemToggledEvent(true, true, null);
         RaiseLocalEvent(ent, ref toggleUsed);
 
-        RemComp<Scp035MaskUserComponent>(args.Wearer);
+        RemComp<Scp035MaskUserComponent>(args.EquipTarget);
     }
 
     private void OnEquippeAttempt(Entity<Scp035MaskComponent> ent, ref BeingEquippedAttemptEvent args)
@@ -107,18 +106,18 @@ public abstract class SharedScp035System : EntitySystem
         if (!_mobState.IsAlive(ent))
             return;
 
-        if (!HasComp<HumanoidProfileComponent>(args.Equipee))
+        if (!HasComp<HumanoidProfileComponent>(args.EquipTarget))
         {
             args.Cancel();
 
-            _stun.TryAddParalyzeDuration(args.Equipee, ent.Comp.EquipAttemptParalyzeDuration);
+            _stun.TryAddParalyzeDuration(args.EquipTarget, ent.Comp.EquipAttemptParalyzeDuration);
 
             if (_net.IsServer)
             {
-                _popup.PopupEntity(Loc.GetString("scp-035-reject-you"), args.Equipee, args.Equipee, PopupType.LargeCaution);
+                _popup.PopupEntity(Loc.GetString("scp-035-reject-you"), args.EquipTarget, args.EquipTarget, PopupType.LargeCaution);
 
                 var impulse = _random.NextVector2() * ent.Comp.ImpulseModificator;
-                _physics.ApplyLinearImpulse(args.Equipee, impulse);
+                _physics.ApplyLinearImpulse(args.EquipTarget, impulse);
             }
         }
     }

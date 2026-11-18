@@ -11,13 +11,12 @@
     sprite: _Scp/Objects/Scp/scp-3199.rsi
   - type: Item
     size: Normal
-  - type: Muted
+  - type: MutedStatusEffect
   - type: MovementSpeedModifier
     baseWalkSpeed: 0
     baseSprintSpeed: 0
   - type: GhostTakeoverAvailable
-  - type: ToggleableNightVision
-    effect: ScpEffectNightVision
+  - type: NightVision
   - type: JumpAbility # чо бы и нет
     action: ActionScp3199Jump
     collideKnockdown: 0
@@ -31,6 +30,8 @@
     description: ghost-role-information-scp3199-egg-description
     raffle:
       settings: short
+  - type: Injurable
+    damageContainer: Inorganic
 
 - type: entity
   id: Scp3199EggFirst
@@ -54,7 +55,6 @@
   - type: PolymorphOnTrigger
     polymorph: Egg3Scp3199
   - type: Damageable
-    damageContainer: Inorganic
   - type: Destructible
     thresholds:
     - trigger: !type:DamageTrigger
@@ -74,7 +74,6 @@
   - type: PolymorphOnTrigger
     polymorph: Egg4Scp3199
   - type: Damageable
-    damageContainer: Inorganic
   - type: Destructible
     thresholds:
     - trigger: !type:DamageTrigger
@@ -94,7 +93,6 @@
   - type: PolymorphOnTrigger
     polymorph: ChildScp3199
   - type: Damageable
-    damageContainer: Inorganic
   - type: Destructible
     thresholds:
     - trigger: !type:DamageTrigger
